@@ -20,15 +20,25 @@ function transpileToCpp(customCode) {
     cpp = cpp.replace(/=\s*\[(.*?)\]/g, "= {$1}");
 
     // 2. 基本的な型やキーワードの置換
-    cpp = cpp.replaceAll('M{', 'int main(){');
-    // ↑の I() の置換から漏れた（＝(が付いていない）I だけが long long int になります
-    cpp = cpp.replaceAll('I ', 'long long int '); 
-    cpp = cpp.replaceAll('S ', 'string ');
-    cpp = cpp.replaceAll('B ', 'bool ');
-    cpp = cpp.replaceAll('V ', 'vector ');
-    cpp = cpp.replaceAll('R ', 'return ');
-    cpp = cpp.replaceAll('IF', 'if');
-    cpp = cpp.replaceAll('W ', 'while ');
+    // \b（単語の境界）を使うことで、< > , ; などの記号と接していても正確に置換します
+
+    // main関数の M{ （間にスペースがあっても対応できるようにします）
+    cpp = cpp.replace(/\bM\s*\{/g, 'int main(){');
+
+    // データ型・キーワードの置換
+    cpp = cpp.replace(/\bI\b/g, 'long long int');
+    cpp = cpp.replace(/\bS\b/g, 'string');
+    cpp = cpp.replace(/\bB\b/g, 'bool');
+    cpp = cpp.replace(/\bV\b/g, 'vector');
+    cpp = cpp.replace(/\bD\b/g, 'long double');
+    cpp = cpp.replace(/\bP\b/g, 'pair');
+    cpp = cpp.replace(/\bT\b/g, 'tuple');
+    cpp = cpp.replace(/\bC\b/g, 'char');
+    cpp = cpp.replace(/\bM\b/g, 'map');  // ↑で M{ を処理済みなので、残った M は自動で map になります
+    cpp = cpp.replace(/\bF\b/g, 'void');
+    cpp = cpp.replace(/\bR\b/g, 'return');
+    cpp = cpp.replace(/\bIF\b/g, 'if');
+    cpp = cpp.replace(/\bW\b/g, 'while');
 
     // 3. C++の必須ヘッダー
     const header = `#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\n`;
