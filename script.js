@@ -2,7 +2,7 @@
 function transpileToCpp(customCode) {
     let cpp = customCode;
 
-    // 1. 関数系・マクロ系の置換（カッコを伴うものを先に処理する）
+    // 1. 先に関数系・マクロ系の置換（カッコを伴うもの）
     
     // 入力 I(a, b) -> cin >> a >> b;
     cpp = cpp.replace(/I\((.*?)\);/g, function(match, p1) {
@@ -16,24 +16,17 @@ function transpileToCpp(customCode) {
         return `std::cout << ${args};`;
     });
 
-    // 増加ループ FP(i, 0, n) -> for(long long int i = 0; i < n; i++)
+    // ループ系マクロ
     cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, "for(long long int $1 = $2; $1 < $3; $1++)");
-
-    // 減少ループ FM(i, n, 0) -> for(long long int i = n; i > 0; i--)
     cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, "for(long long int $1 = $2; $1 > $3; $1--)");
-
-    // 【追加】通常のfor文：あとに「(`」が付く F(...) -> for(...)
-    // ※ F と ( の間にスペースがあっても対応できるように \s* を入れています
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
-    // 配列の初期化 = [1, 2, 3] を = {1, 2, 3} に変換する
+    // 配列の初期化 = [1, 2, 3] -> = {1, 2, 3}
     cpp = cpp.replace(/=\s*\[(.*?)\]/g, "= {$1}");
 
-    // 2. 基本的な型やキーワードの置換
-    // main関数の M{
+    // 2. 基本的な型やキーワードの置換（\b で正確に単語単位で置換）
     cpp = cpp.replace(/\bM\s*\{/g, 'int main(){');
 
-    // データ型・キーワードの置換
     cpp = cpp.replace(/\bI\b/g, 'long long int');
     cpp = cpp.replace(/\bS\b/g, 'string');
     cpp = cpp.replace(/\bB\b/g, 'bool');
@@ -43,15 +36,17 @@ function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bT\b/g, 'tuple');
     cpp = cpp.replace(/\bC\b/g, 'char');
     cpp = cpp.replace(/\bM\b/g, 'map');
-    
-    // 【復活】カッコの付かない単独の F は void に変換
     cpp = cpp.replace(/\bF\b/g, 'void'); 
-    
     cpp = cpp.replace(/\bR\b/g, 'return');
     cpp = cpp.replace(/\bIF\b/g, 'if');
     cpp = cpp.replace(/\bW\b/g, 'while');
 
-    // 3. C++の必須ヘッダー
+    // 3. 【重要】変数未初期化によるbad_allocを防ぐ安全対策
+    // 「long long int 変数名;」を「long long int 変数名 = 0;」に自動初期化する
+    // これにより、もし入力が空でも n = 0 になり、メモリ爆発(bad_alloc)を防げます。
+    cpp = cpp.replace(/long long int\s+([a-zA-Z0-9_]+);/g, "long long int $1 = 0;");
+
+    // 4. C++の必須ヘッダー
     const header = `#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\n`;
     
     return header + cpp;
