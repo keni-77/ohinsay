@@ -2,9 +2,24 @@
 function transpileToCpp(customCode) {
     let cpp = customCode;
 
-    // 1. 基本的な型やキーワードの置換 (順序が大事です)
+    // 1. 関数系の置換（I() と O() を先に処理する）
+    // 【修正】入力 I(a, b) -> cin >> a >> b;
+    // ※「(」が付いているものを優先して置換することで、型の I と自動で区別されます。
+    cpp = cpp.replace(/I\((.*?)\);/g, function(match, p1) {
+        let args = p1.split(',').map(arg => arg.trim()).join(' >> ');
+        return `std::cin >> ${args};`;
+    });
+
+    // 出力 O(a, b) -> cout << a << b;
+    cpp = cpp.replace(/O\((.*?)\);/g, function(match, p1) {
+        let args = p1.split(',').map(arg => arg.trim()).join(' << ');
+        return `std::cout << ${args};`;
+    });
+
+    // 2. 基本的な型やキーワードの置換
     cpp = cpp.replaceAll('M{', 'int main(){');
-    cpp = cpp.replaceAll('I ', 'long long int ');
+    // ↑の I() の置換から漏れた（＝(が付いていない）I だけが long long int になります
+    cpp = cpp.replaceAll('I ', 'long long int '); 
     cpp = cpp.replaceAll('S ', 'string ');
     cpp = cpp.replaceAll('B ', 'bool ');
     cpp = cpp.replaceAll('V ', 'vector ');
@@ -12,14 +27,7 @@ function transpileToCpp(customCode) {
     cpp = cpp.replaceAll('IF', 'if');
     cpp = cpp.replaceAll('W ', 'while ');
 
-    // 2. 出力 O(a, b, c) -> cout << a << b << c; の簡易版
-    // ※カンマ区切りを「 << 」に置換するロジック（簡易実装）
-    cpp = cpp.replace(/O\((.*?)\);/g, function(match, p1) {
-        let args = p1.split(',').map(arg => arg.trim()).join(' << ');
-        return `std::cout << ${args};`;
-    });
-
-    // 3. C++で動かすための必須ヘッダーを自動で先頭に付け足す
+    // 3. C++の必須ヘッダー
     const header = `#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\n`;
     
     return header + cpp;
