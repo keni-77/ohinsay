@@ -13,22 +13,22 @@
     </style>
 </head>
 <body>
-    <h2>独自言語 オンラインエディタ</h2>
+    <h2>Antiverbosity オンラインエディタ</h2>
     
-    <h3>1. コード入力</h3>
+    <h3>ソースコード（コードを入力するエリア）</h3>
     <textarea id="sourceCode" class="box" placeholder="M{ I a, b; IN(a, b); O(a + b); }"></textarea>
     
-    <h3>2. 標準入力（プログラムに渡すデータ）</h3>
+    <h3>標準入力（プログラムに渡すデータ）</h3>
     <textarea id="stdin" class="box" placeholder="5 10"></textarea>
     
-    <button onclick="runCode()">実行する</button>
+    <button onclick="runCode()">実行</button>
     
-    <h3>3. 実行結果</h3>
+    <h3>標準出力（プログラムを実行した結果）</h3>
     <pre id="output">ここに結果が表示されます</pre>
 
     <hr>
 <div id="authSection" style="margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px;">
-    <h3>学校用 独自ログイン</h3>
+    <h3>ログイン（ブラウザをリロードする度にログアウトされます。）</h3>
     <p style="font-size: 12px; color: #666;">※データはこのパソコンのブラウザ内だけに秘密裏に保存されます。</p>
     <input type="text" id="username" placeholder="ユーザー名" style="padding: 5px;">
     <input type="password" id="password" placeholder="パスワード" style="padding: 5px;">
