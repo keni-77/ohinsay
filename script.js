@@ -44,7 +44,7 @@ function transpileToCpp(customCode) {
 
     cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, "for(long long int $1 = $2; $1 < $3; $1++)");
     cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, "for(long long int $1 = $2; $1 > $3; $1--)");
-    cpp = cpp.replace(/\bFOR\s*\(/g, "for(");
+    cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
     // ==========================================
     // 4. 独自文字列メソッド（L, RV, ST, RST, RP, SP, CT, FD）
