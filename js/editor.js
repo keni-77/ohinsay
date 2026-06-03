@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Backspace' && start === end && start > 0) {
             const charBefore = value.substring(start - 1, start);
             const charAfter = value.substring(start, start + 1);
-            const pairs = { '(': ')', '{': '}', '[': ']', '"': '"', "'": "'" };
+            const pairs = { '(': ')', '{': '}', '[': ']', '"': '"', "'": "'", "<": ">" };
 
             if (pairs[charBefore] && pairs[charBefore] === charAfter) {
                 e.preventDefault();
