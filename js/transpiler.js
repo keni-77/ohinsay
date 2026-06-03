@@ -12,33 +12,42 @@ function parsePowerExpression(expr) {
             i++;
             let inside = parseExpr();
             skip();
-            if (expr[i] !== ')') throw new Error("Missing )");
+            if (expr[i] !== ')') throw new Error("Missing ) in parsePowerExpression");
             i++;
             return "(" + inside + ")";
         }
 
+        // allow identifiers, numbers, and literal placeholders like __ANT_LITERAL_0__
         let start = i;
-        while (i < expr.length && /[A-Za-z0-9_]/.test(expr[i])) i++;
+        while (i < expr.length && /[A-Za-z0-9_\.\$]/.test(expr[i])) i++;
         return expr.slice(start, i);
     }
 
     function parsePower() {
         let left = parseAtom();
         skip();
+        let parts = [left];
         while (expr[i] === '^') {
             i++;
-            let right = parseAtom();
-            left = `_ant_pow(${left}, ${right})`;
+            skip();
+            parts.push(parseAtom());
             skip();
         }
-        return left;
+        if (parts.length === 1) return left;
+        // fold right-associative
+        let acc = parts[parts.length - 1];
+        for (let k = parts.length - 2; k >= 0; k--) {
+            acc = `_ant_pow(${parts[k]}, ${acc})`;
+        }
+        return acc;
     }
 
     function parseExpr() {
         let left = parsePower();
         skip();
-        while (/[+\-*/]/.test(expr[i])) {
+        while (i < expr.length && /[+\-*/]/.test(expr[i])) {
             let op = expr[i++];
+            skip();
             let right = parsePower();
             left = `${left} ${op} ${right}`;
             skip();
@@ -59,7 +68,8 @@ export function transpileToCpp(customCode) {
     });
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
     // ^=（累乗代入）
-    cpp = cpp.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\^=\s*([^;\n]+)/g, (m, v, expr) => `${v} = ${parsePowerExpression(`${v} ^ (${expr})`)}`);
+    cpp = cpp.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\^=\s*([^;\n]+)/g,(m, v, expr) => `${v} = ${parsePowerExpression(`${v} ^ (${expr})`)}`);
+    
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*-=\s*([^;\n]+)/g, "_ant_minus_assign($1, $2)");
@@ -81,7 +91,8 @@ export function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 > $3; $1--)");
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
-    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/]+)(?=[;,)}\]]|$)/g, (m) => {
+    // ^（通常の累乗） -- 最後に、式単位で安全に処理
+    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/\.]+)(?=\s*[;,)}\]]|$)/g, (m) => {
         if (m.includes("^")) return parsePowerExpression(m);
         return m;
     });
