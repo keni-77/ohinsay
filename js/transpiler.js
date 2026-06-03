@@ -85,23 +85,8 @@ struct any_empty {
     friend bool operator==(const string& s, const any_empty&) { return s.empty(); }
 };
 
-struct AntPow {
-    long double val;
-    template<typename T> operator T() const {
-        if constexpr (std::is_integral_v<T>) return (T)std::round(val);
-        else return (T)val;
-    }
-    template<typename T> bool operator==(T other) const { return val == other; }
-    template<typename T> friend bool operator==(T other, AntPow p) { return other == p.val; }
-    friend ostream& operator<<(ostream& os, const AntPow& p) {
-        if (floor(p.val) == p.val) os << (long long int)p.val;
-        else os << p.val;
-        return os;
-    }
-};
 template<typename T, typename U>
-AntPow _ant_pow(T x, U n) { return AntPow{ std::pow((long double)x, (long double)n) }; }
-
+T _ant_pow(T x, U n) {return (T)std::pow((long double)x, (long double)n);}
 void _ant_minus_assign(string& s, int n) { if((int)s.length() >= n) s.erase(s.length() - n); }
 template<typename T> void _ant_minus_assign(T& x, T n) { x -= n; }
 
