@@ -80,15 +80,8 @@ function transpileToCpp(customCode) {
         cpp = cpp.replace(/\bT<\s*([^<>]+?)\s*>/g, "tuple<$1>");
         if (old === cpp) changed = false;
     }
-    cpp = cpp.replace(/=\s*
-                      
-    \[([^
-       
-    \[\]
-       
-    ]+?)\]
-                      
-    /g, "= {$1}");
+    // 代入右辺の配列リテラルを { ... } に変換（空配列も含む）
+    cpp = cpp.replace(/=\s*\[([^\[\]]*?)\]/g, "= {$1}");
 
     // ==========================================
     // 7. 基本型・キーワードの最終置換
