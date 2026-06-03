@@ -25,10 +25,10 @@ export function transpileToCpp(customCode) {
         return `std::cout << ${args};`;
     });
 
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)\s*\{/g,"for(long long int $1 = $2; $1 < $3; $1++){");
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g,"for(long long int $1 = $2; $1 < $3; $1++)");
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)\s*\{/g,"for(long long int $1 = $2; $1 > $3; $1--){");
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g,"for(long long int $1 = $2; $1 > $3; $1--)");
+    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g,"for(long long int $1 = $2; $1 < $3; $1++){");
+    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 < $3; $1++)");
+    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g,"for(long long int $1 = $2; $1 > $3; $1--){");
+    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 > $3; $1--)");
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
     cpp = cpp.replace(/\.L\b/g, ".length()");
