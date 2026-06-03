@@ -73,10 +73,6 @@ function transpileToCpp(customCode) {
     let changed = true;
     while (changed) {
         let old = cpp;
-        // 独自言語仕様の [ ] 表記を変換
-        cpp = cpp.replace(/\bV\[([^\[\]]+?)\]/g, "vector<$1>");
-        cpp = cpp.replace(/\bM\[([^\[\]]+?)\]/g, "map<$1>");
-        // うっかり C++ 風に書いちゃった < > 表記も一緒に救済変換！(多次元配列も対応)
         cpp = cpp.replace(/\bV<([^<>]+?)>/g, "vector<$1>");
         cpp = cpp.replace(/\bM<([^<>]+?)>/g, "map<$1>");
         
@@ -84,8 +80,15 @@ function transpileToCpp(customCode) {
         cpp = cpp.replace(/\bT\(([^()]+?)\)/g, "tuple<$1>");
         if (old === cpp) changed = false;
     }
-
-    cpp = cpp.replace(/\[\]/g, "{}");
+    cpp = cpp.replace(/=\s*
+                      
+    \[([^
+       
+    \[\]
+       
+    ]+?)\]
+                      
+    /g, "= {$1}");
 
     // ==========================================
     // 7. 基本型・キーワードの最終置換
@@ -96,6 +99,7 @@ function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bB\b/g, 'bool');
     cpp = cpp.replace(/\bD\b/g, 'long double');
     cpp = cpp.replace(/\bC\b/g, 'char');
+    cpp = cpp.replace(/\bA\b/g, 'auto');
     cpp = cpp.replace(/\bF\b/g, 'void'); 
     cpp = cpp.replace(/\bR\b/g, 'return');
     cpp = cpp.replace(/\bIF\b/g, 'if');
