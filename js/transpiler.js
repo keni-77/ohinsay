@@ -9,7 +9,7 @@ export function transpileToCpp(customCode) {
     });
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\^=\s*([^;\n]+)/g, "$1 = _ant_pow($1, $2)");
-    cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\^\s*([a-zA-Z0-9_$.\[\]()_+-]+)/g, "_ant_pow($1, $2)");
+    cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\^\s*([^;\n]+)/g,"_ant_pow($1, $2)");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*-=\s*([^;\n]+)/g, "_ant_minus_assign($1, $2)");
