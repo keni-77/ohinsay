@@ -76,8 +76,8 @@ function transpileToCpp(customCode) {
         cpp = cpp.replace(/\bV<([^<>]+?)>/g, "vector<$1>");
         cpp = cpp.replace(/\bM<([^<>]+?)>/g, "map<$1>");
         
-        cpp = cpp.replace(/\bP\(([^()]+?)\)/g, "pair<$1>");
-        cpp = cpp.replace(/\bT\(([^()]+?)\)/g, "tuple<$1>");
+        cpp = cpp.replace(/\bP<\s*([^<>]+?)\s*>/g, "pair<$1>");
+        cpp = cpp.replace(/\bT<\s*([^<>]+?)\s*>/g, "tuple<$1>");
         if (old === cpp) changed = false;
     }
     cpp = cpp.replace(/=\s*
