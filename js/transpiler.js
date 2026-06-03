@@ -60,11 +60,6 @@ export function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
     // ^=（累乗代入）
     cpp = cpp.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\^=\s*([^;\n]+)/g, (m, v, expr) => `${v} = ${parsePowerExpression(`${v} ^ (${expr})`)}`);
-    // ^（通常の累乗）
-    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/]+)/g, (m) => {
-        if (m.includes("^")) return parsePowerExpression(m);
-        return m;
-    });
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*-=\s*([^;\n]+)/g, "_ant_minus_assign($1, $2)");
@@ -85,6 +80,11 @@ export function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g,"for(long long int $1 = $2; $1 > $3; $1--){");
     cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 > $3; $1--)");
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
+
+    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/]+)(?=[;,)}\]]|$)/g, (m) => {
+        if (m.includes("^")) return parsePowerExpression(m);
+        return m;
+    });
 
     cpp = cpp.replace(/\.L\b/g, ".length()");
     cpp = cpp.replace(/\bRV\((.*?)\);/g, "std::reverse($1.begin(), $1.end());");
