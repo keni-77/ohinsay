@@ -85,10 +85,25 @@ export function transpileToCpp(customCode) {
         return `std::cout << ${args};`;
     });
 
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g,"for(long long int $1 = $2; $1 < $3; $1++){");
-    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 < $3; $1++)");
-    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g,"for(long long int $1 = $2; $1 > $3; $1--){");
-    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g,"for(long long int $1 = $2; $1 > $3; $1--)");
+    // FP / FM（for） -- 第3引数をその場で parsePowerExpression に通す（安全）
+    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g, function(_, v, start, end) {
+        // end は FP の第3引数（文字列）。ここで安全にパースして埋める
+        let parsedEnd = parsePowerExpression(end);
+        return `for(long long int ${v} = ${start}; ${v} < ${parsedEnd}; ${v}++){`;
+    });
+    cpp = cpp.replace(/\bFP\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g, function(_, v, start, end) {
+        let parsedEnd = parsePowerExpression(end);
+        return `for(long long int ${v} = ${start}; ${v} < ${parsedEnd}; ${v}++)`;
+    });
+    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)\s*\{/g, function(_, v, start, end) {
+        let parsedEnd = parsePowerExpression(end);
+        return `for(long long int ${v} = ${start}; ${v} > ${parsedEnd}; ${v}--){`;
+    });
+    cpp = cpp.replace(/\bFM\(([^,]+),\s*([^,]+),\s*((?:[^()]|\([^()]*\))*)\)/g, function(_, v, start, end) {
+        let parsedEnd = parsePowerExpression(end);
+        return `for(long long int ${v} = ${start}; ${v} > ${parsedEnd}; ${v}--)`;
+    });
+    
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
     // ^（通常の累乗） -- 最後に、式単位で安全に処理
