@@ -1,4 +1,54 @@
 // js/transpiler.js
+function parsePowerExpression(expr) {
+    let i = 0;
+
+    function skip() {
+        while (i < expr.length && /\s/.test(expr[i])) i++;
+    }
+
+    function parseAtom() {
+        skip();
+        if (expr[i] === '(') {
+            i++;
+            let inside = parseExpr();
+            skip();
+            if (expr[i] !== ')') throw new Error("Missing )");
+            i++;
+            return "(" + inside + ")";
+        }
+
+        let start = i;
+        while (i < expr.length && /[A-Za-z0-9_]/.test(expr[i])) i++;
+        return expr.slice(start, i);
+    }
+
+    function parsePower() {
+        let left = parseAtom();
+        skip();
+        while (expr[i] === '^') {
+            i++;
+            let right = parseAtom();
+            left = `_ant_pow(${left}, ${right})`;
+            skip();
+        }
+        return left;
+    }
+
+    function parseExpr() {
+        let left = parsePower();
+        skip();
+        while (/[+\-*/]/.test(expr[i])) {
+            let op = expr[i++];
+            let right = parsePower();
+            left = `${left} ${op} ${right}`;
+            skip();
+        }
+        return left;
+    }
+
+    return parseExpr();
+}
+
 export function transpileToCpp(customCode) {
     let cpp = customCode.replace(/[\u3000\u00a0]/g, " ");
 
@@ -8,8 +58,7 @@ export function transpileToCpp(customCode) {
         return `__ANT_LITERAL_${literals.length - 1}__`;
     });
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
-    cpp = cpp.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\^=\s*([^;\n]+)/g,"$1 = _ant_pow($1, $2)");
-    cpp = cpp.replace(/([A-Za-z0-9_()]+)\s*\^\s*([A-Za-z0-9_()]+)/g,"_ant_pow($1, $2)");
+    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/]+)/g, (m) => {if (m.includes("^")) return parsePowerExpression(m); return m;});
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*-=\s*([^;\n]+)/g, "_ant_minus_assign($1, $2)");
