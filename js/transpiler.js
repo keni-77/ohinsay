@@ -58,6 +58,7 @@ export function transpileToCpp(customCode) {
         return `__ANT_LITERAL_${literals.length - 1}__`;
     });
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
+    cpp = cpp.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\^=\s*([^;\n]+)/g,(m, v, expr) => `${v} = ${parsePowerExpression(`${v} ^ (${expr})`)}`);
     cpp = cpp.replace(/([A-Za-z0-9_() +\-*/]+)/g, (m) => {if (m.includes("^")) return parsePowerExpression(m); return m;});
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
