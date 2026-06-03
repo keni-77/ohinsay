@@ -7,14 +7,13 @@ export function transpileToCpp(customCode) {
         literals.push(match);
         return `__ANT_LITERAL_${literals.length - 1}__`;
     });
-    cpp = cpp.replace(/\b(I|S|B|D|C)\(([^)]+)\);/g, "IN($2);");
     cpp = cpp.replace(/\bE\b/g, "any_empty{}");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\^=\s*([^;\n]+)/g, "$1 = _ant_pow($1, $2)");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\^\s*([a-zA-Z0-9_$.\[\]()_+-]+)/g, "_ant_pow($1, $2)");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\*\*/g, "$1 *= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*\/\//g, "$1 /= 2");
     cpp = cpp.replace(/([a-zA-Z0-9_$.\[\]()_]+)\s*-=\s*([^;\n]+)/g, "_ant_minus_assign($1, $2)");
-    cpp = cpp.replace(/\bIN\((.*?)\);/g, function(match, p1) {
+    cpp = cpp.replace(/\bI\((.*?)\);/g, function(match, p1) {
         if (!p1.trim()) return "std::cin;";
         let args = p1.split(',').map(arg => arg.trim()).join(' >> ');
         return `std::cin >> ${args};`;
