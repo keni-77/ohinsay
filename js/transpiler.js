@@ -107,7 +107,7 @@ export function transpileToCpp(customCode) {
     cpp = cpp.replace(/\bF\s*\(/g, "for(");
 
     // ^（通常の累乗） -- 最後に、式単位で安全に処理
-    cpp = cpp.replace(/([A-Za-z0-9_() +\-*/\.]+)(?=\s*[;,)}\]]|$)/g, (m) => {
+    cpp = cpp.replace(/\([^()]*\)/g, (m) => {
         if (m.includes("^")) return parsePowerExpression(m);
         return m;
     });
