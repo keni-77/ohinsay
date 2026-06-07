@@ -46,9 +46,32 @@
       <img src="Ant.svg" alt="logo">
     </header>
     <h2>Antiverbosity オンラインエディタ</h2>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     
     <h3>ソースコード（コードを入力するエリア）</h3>
     <textarea id="sourceCode" class="box" placeholder="M{ I a, b; I(a, b); O(a + b); }"></textarea>
+
+    <script>
+    // Ooho!語の簡易モード
+    CodeMirror.defineSimpleMode("ooho", {
+      start: [
+        {regex: /Oh.*$/, token: "comment"},
+        {regex: /Oo[\s\S]*?oO/, token: "comment"},
+        {regex: /"(?:\\.|[^"\\])*"/, token: "string"},
+        {regex: /\b[0-9]+(?:\.[0-9]+)?\b/, token: "number"},
+        {regex: /\b(?:oh\?|oh|oono|Ooho|ho|range|say)\b/, token: "keyword"}
+      ]
+    });
+    var editor = CodeMirror.fromTextArea(
+      document.getElementById("sourceCode"),
+      {
+        lineNumbers: true,
+        mode: "ooho"
+      }
+    );
+    </script>
     
     <h3>標準入力（プログラムに渡すデータ）</h3>
     <textarea id="stdin" class="box" placeholder="5 10"></textarea>
