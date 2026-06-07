@@ -2,26 +2,23 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Antiverbosity — 短い言語</title>
-    <meta name="description" content="C++の汎ゆる書き方が短縮された言語。オンラインで即実行。">
+    <title>Ooho語 オンラインエディタ</title>
+    <meta name="description" content="Ooho!の教えに基づいたプログラミング言語。オンラインで即実行。">
 
-    <meta property="og:title" content="Antiverbosity — 短い言語">
-    <meta property="og:description" content="C++の汎ゆる書き方が短縮された言語。オンラインで即実行。">
+    <meta property="og:title" content="Ooho!語 オンラインエディタ">
+    <meta property="og:description" content="Ooho!の教えに基づいたプログラミング言語。オンラインで即実行。">
     <meta property="og:image" content="https://keni-77.github.io/Antiverbosity/ogp.png">
     <meta property="og:url" content="https://keni-77.github.io/Antiverbosity/">
     <meta property="og:type" content="website">
-    <meta property="og:image:alt" content="AntiverbosityのOGP画像">
+    <meta property="og:image:alt" content="Ooho!語のOGP画像">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Antiverbosity — 短い言語">
-    <meta name="twitter:description" content="C++の汎ゆる書き方が短縮された言語。オンラインで即実行。">
+    <meta name="twitter:title" content="Ooho!語 オンラインエディタ">
+    <meta name="twitter:description" content="Ooho!の教えに基づいたプログラミング言語。オンラインで即実行。">
     <meta name="twitter:image" content="https://keni-77.github.io/Antiverbosity/ogp.png">
     <meta name="twitter:url" content="https://keni-77.github.io/Antiverbosity/">
 
     <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/mode/simple.min.js"></script>
     
     <style>
         body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
@@ -43,23 +40,6 @@
           border-radius: 50%;
         }
         
-        .CodeMirror-line > span {
-          line-height: 1.1 !important;
-        }
-        
-        .CodeMirror {
-          font-size: 14px;
-        }
-
-        .CodeMirror pre {
-          line-height: 1.1 !important;
-          padding: 0 !important;
-        }
-
-        .CodeMirror-lines {
-          padding: 0 !important;
-        }
-
     </style>
     <meta name="google-site-verification" content="SSt1FC2LIixLLQjorFB8JGqDvSFYcOEDzI6M6b_CqO8" />
 </head>
@@ -68,37 +48,17 @@
     <header>
       <img src="Ant.svg" alt="logo">
     </header>
-    <h2>Antiverbosity オンラインエディタ</h2>
+    <h2>Ooho!語 オンラインエディタ</h2>
     
-    <h3>ソースコード（コードを入力するエリア）</h3>
-    <textarea id="sourceCode" class="box" placeholder="M{ I a, b; I(a, b); O(a + b); }"></textarea>
-
-    <script>
-    // Ooho!語の簡易モード
-    CodeMirror.defineSimpleMode("ooho", {
-      start: [
-        {regex: /Oh.*$/, token: "comment"},
-        {regex: /Oo[\s\S]*?oO/, token: "comment"},
-        {regex: /"(?:\\.|[^"\\])*"/, token: "string"},
-        {regex: /\b[0-9]+(?:\.[0-9]+)?\b/, token: "number"},
-        {regex: /\b(?:oh\?|oh|oono|Ooho|ho|range|say)\b/, token: "keyword"}
-      ]
-    });
-    var editor = CodeMirror.fromTextArea(
-      document.getElementById("sourceCode"),
-      {
-        lineNumbers: true,
-        mode: "ooho"
-      }
-    );
-    </script>
+    <h3>ソースコード</h3>
+    <textarea id="sourceCode" class="box" placeholder="oh a b c"></textarea>
     
     <h3>標準入力（プログラムに渡すデータ）</h3>
     <textarea id="stdin" class="box" placeholder="5 10"></textarea>
     
     <button onclick="runCode()">実行</button>
     
-    <h3>標準出力（プログラムを実行した結果）</h3>
+    <h3>標準出力</h3>
     <pre id="output">ここに結果が表示されます</pre>
 
     <hr>
